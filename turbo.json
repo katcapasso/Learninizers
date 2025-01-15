@@ -1,0 +1,9 @@
+{
+    "pipeline": {
+      "build": {
+        "outputs": ["apps/**/.next/**", "apps/**/dist/**"]
+      },
+      "dev": {}
+    }
+  }
+  

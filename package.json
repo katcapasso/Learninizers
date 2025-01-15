@@ -1,0 +1,17 @@
+{
+    "name": "learninizer",
+    "private": true,
+    "workspaces": [
+      "apps/*",
+      "packages/*"
+    ],
+    "scripts": {
+      "build": "turbo run build",
+      "dev": "turbo run dev"
+    },
+    "dependencies": {},
+    "devDependencies": {
+      "turbo": "^1.10.0"
+    }
+  }
+  
