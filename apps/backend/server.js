@@ -1,35 +1,29 @@
-const express = require('express');
-const multer = require('multer');
-const pdfParse = require('pdf-parse');
-const tesseract = require('tesseract.js');
-require('dotenv').config();
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+
+const extractRoutes = require("./api/extractText");
+const explainRoutes = require("./api/explain");
+const generateImageRoutes = require("./api/generateImage");
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const port = 3001;
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Extract text from PDF
-app.post('/api/extract/pdf', upload.single('file'), async (req, res) => {
-  try {
-    const data = await pdfParse(req.file.buffer);
-    res.json({ text: data.text });
-  } catch (err) {
-    res.status(500).send('Error extracting text from PDF.');
-  }
+// API Routes
+app.use("/api", extractRoutes);
+app.use("/api", explainRoutes);
+app.use("/api", generateImageRoutes);
+
+// Root route
+app.get("/", (req, res) => {
+  res.send("Welcome to the Learninizer Backend API!");
 });
 
-// Extract text from Image
-app.post('/api/extract/image', upload.single('file'), async (req, res) => {
-  try {
-    const text = await tesseract.recognize(req.file.path, 'eng');
-    res.json({ text: text.data.text });
-  } catch (err) {
-    res.status(500).send('Error extracting text from image.');
-  }
-});
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+// Start the server
+app.listen(port, () => {
+  console.log(`Backend server is running on http://localhost:${port}`);
 });

@@ -1,24 +1,33 @@
-const { extractTextFromPDF, extractTextFromImage } = require('./extractText');
+const formidable = require("formidable");
+const fs = require("fs");
+const pdfParse = require("pdf-parse");
 
-module.exports.handleTextExtraction = async (req, res) => {
-  const { type } = req.params;
+// Parse the file upload
+const processFileUpload = (req) => {
+  return new Promise((resolve, reject) => {
+    const form = new formidable.IncomingForm();
 
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file provided.' });
-  }
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        return reject({ error: "Error parsing the file", details: err });
+      }
 
-  try {
-    let extractedText;
-    if (type === 'pdf') {
-      extractedText = await extractTextFromPDF(req.file.buffer);
-    } else if (type === 'image') {
-      extractedText = await extractTextFromImage(req.file.path);
-    } else {
-      return res.status(400).json({ error: 'Invalid file type.' });
-    }
+      const filePath = files.file.filepath;
+      const fileType = files.file.mimetype;
 
-    res.status(200).json({ text: extractedText });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+      resolve({ filePath, fileType });
+    });
+  });
 };
+
+// Extract text from PDF
+const extractTextFromPDF = (filePath) => {
+  return new Promise((resolve, reject) => {
+    const fileBuffer = fs.readFileSync(filePath);
+    pdfParse(fileBuffer)
+      .then((data) => resolve(data.text))
+      .catch((error) => reject({ error: "Error extracting text from PDF", details: error }));
+  });
+};
+
+module.exports = { processFileUpload, extractTextFromPDF };

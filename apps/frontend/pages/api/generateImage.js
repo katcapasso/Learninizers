@@ -1,34 +1,25 @@
-export const config = {
-    runtime: 'edge',
-  };
-  
-  export default async function handler(req) {
-    if (req.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405 });
-    }
-  
-    const { prompt } = await req.json();
+export default async function handler(req, res) {
+    const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generateImage`;
   
     try {
-      const response = await fetch(`https://api.openai.com/v1/images/generations`, {
-        method: 'POST',
+      const response = await fetch(backendUrl, {
+        method: req.method,
         headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          prompt,
-          n: 1,
-          size: '1024x1024',
-        }),
+        body: JSON.stringify(req.body),
       });
   
+      if (!response.ok) {
+        const error = await response.json();
+        return res.status(response.status).json(error);
+      }
+  
       const data = await response.json();
-      return new Response(JSON.stringify({ imageUrl: data.data[0].url }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      res.status(200).json(data);
     } catch (error) {
-      return new Response('Error generating image', { status: 500 });
+      console.error("Error forwarding request to backend:", error);
+      res.status(500).json({ error: "Failed to process the request." });
     }
   }
   

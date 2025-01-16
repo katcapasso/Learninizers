@@ -1,33 +1,31 @@
-export const config = {
-    runtime: 'edge',
-  };
+export default async function handler(req, res) {
+    const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/explain`;
   
-  export default async function handler(req) {
-    if (req.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405 });
-    }
+    if (req.method === "POST") {
+      try {
+        // Forward the request to the backend
+        const response = await fetch(backendUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(req.body),
+        });
   
-    const { text } = await req.json();
+        if (!response.ok) {
+          const errorData = await response.json();
+          return res.status(response.status).json(errorData);
+        }
   
-    try {
-      const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [{ role: 'user', content: `Explain this: ${text}` }],
-        }),
-      });
-  
-      const data = await response.json();
-      return new Response(JSON.stringify({ explanation: data.choices[0].message.content }), {
-        headers: { 'Content-Type': 'application/json' },
-      });
-    } catch (error) {
-      return new Response('Error processing request', { status: 500 });
+        const data = await response.json();
+        res.status(200).json(data);
+      } catch (error) {
+        console.error("Error forwarding explain request:", error);
+        res.status(500).json({ error: "Failed to process the request." });
+      }
+    } else {
+      res.setHeader("Allow", ["POST"]);
+      res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   }
   

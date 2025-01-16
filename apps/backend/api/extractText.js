@@ -1,20 +1,22 @@
-const pdfParse = require('pdf-parse');
-const tesseract = require('tesseract.js');
+const express = require("express");
+const { processFileUpload, extractTextFromPDF } = require("../processRequest");
 
-module.exports.extractTextFromPDF = async (fileBuffer) => {
-  try {
-    const data = await pdfParse(fileBuffer);
-    return data.text;
-  } catch (error) {
-    throw new Error('Failed to extract text from PDF.');
-  }
-};
+const router = express.Router();
 
-module.exports.extractTextFromImage = async (filePath) => {
+router.post("/extract", async (req, res) => {
   try {
-    const text = await tesseract.recognize(filePath, 'eng');
-    return text.data.text;
+    const { filePath, fileType } = await processFileUpload(req);
+
+    if (fileType !== "application/pdf") {
+      return res.status(400).json({ error: "Invalid file type. Only PDFs are supported." });
+    }
+
+    const text = await extractTextFromPDF(filePath);
+    res.status(200).json({ text });
   } catch (error) {
-    throw new Error('Failed to extract text from image.');
+    console.error("Error in /extract:", error);
+    res.status(500).json({ error: "Failed to process the file", details: error });
   }
-};
+});
+
+module.exports = router;

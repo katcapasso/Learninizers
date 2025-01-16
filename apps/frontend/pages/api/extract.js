@@ -1,27 +1,46 @@
+import formidable from "formidable";
+
 export const config = {
-    runtime: 'edge',
-  };
-  
-  export default async function handler(req) {
-    if (req.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405 });
-    }
-  
-    const { fileType, file } = await req.json();
-  
+  api: {
+    bodyParser: false, // Disables Next.js body parsing to handle file uploads
+  },
+};
+
+export default async function handler(req, res) {
+  if (req.method === "POST") {
     try {
-      const response = await fetch(`${process.env.BACKEND_API_URL}/api/extract/${fileType}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ file }),
+      const form = new formidable.IncomingForm();
+
+      form.parse(req, async (err, fields, files) => {
+        if (err) {
+          console.error("Error parsing form data:", err);
+          return res.status(500).json({ error: "Failed to process file upload." });
+        }
+
+        const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/extract`;
+
+        const formData = new FormData();
+        formData.append("file", fs.createReadStream(files.file.filepath));
+
+        const response = await fetch(backendUrl, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          return res.status(response.status).json(error);
+        }
+
+        const data = await response.json();
+        res.status(200).json(data);
       });
-  
-      const data = await response.json();
-      return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
     } catch (error) {
-      return new Response('Error processing extraction', { status: 500 });
+      console.error("Error processing extract API request:", error);
+      res.status(500).json({ error: "Failed to process the request." });
     }
+  } else {
+    res.setHeader("Allow", ["POST"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-  
+}
