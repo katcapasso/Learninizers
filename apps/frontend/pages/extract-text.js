@@ -3,22 +3,37 @@ import { useState } from "react";
 export default function ExtractText() {
   const [file, setFile] = useState(null);
   const [result, setResult] = useState("");
+  const [error, setError] = useState("");
 
   const handleUpload = async (event) => {
     event.preventDefault();
+    setError("");
+    setResult("");
+
+    if (!file) {
+      setError("Please select a file to upload.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/extract`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/extract`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to extract text");
+
       const data = await response.json();
-      setResult(data.text || "Failed to extract text.");
+      setResult(data.text || "No text extracted.");
     } catch (error) {
       console.error("Error extracting text:", error);
-      setResult("An error occurred.");
+      setError("An error occurred while extracting text.");
     }
   };
 
@@ -31,11 +46,16 @@ export default function ExtractText() {
           accept="application/pdf,image/*"
           onChange={(e) => setFile(e.target.files[0])}
           className="mb-4"
+          required
         />
-        <button type="submit" className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600">
+        <button
+          type="submit"
+          className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
+        >
           Upload & Extract
         </button>
       </form>
+      {error && <p className="text-red-500 mt-4">{error}</p>}
       {result && (
         <div className="mt-6 p-4 bg-white shadow rounded">
           <h2 className="text-lg font-bold">Extracted Text:</h2>

@@ -1,17 +1,20 @@
 {
-    "name": "learninizer",
-    "private": true,
-    "workspaces": [
-      "apps/*",
-      "packages/*"
-    ],
-    "scripts": {
-      "build": "turbo run build",
-      "dev": "turbo run dev"
-    },
-    "dependencies": {},
-    "devDependencies": {
-      "turbo": "^1.10.0"
-    }
+  "name": "learninizer",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "turbo run format"
+  },
+  "dependencies": {
+    "openai": "^4.78.1"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0"
   }
-  
+}

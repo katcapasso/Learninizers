@@ -1,21 +1,21 @@
 const express = require("express");
-const { processFileUpload, extractTextFromPDF } = require("../processRequest");
-
+const multer = require("multer");
+const pdfParse = require("pdf-parse");
 const router = express.Router();
 
-router.post("/extract", async (req, res) => {
+const upload = multer();
+
+router.post("/", upload.single("file"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded." });
+  }
+
   try {
-    const { filePath, fileType } = await processFileUpload(req);
-
-    if (fileType !== "application/pdf") {
-      return res.status(400).json({ error: "Invalid file type. Only PDFs are supported." });
-    }
-
-    const text = await extractTextFromPDF(filePath);
-    res.status(200).json({ text });
+    const data = await pdfParse(req.file.buffer);
+    res.json({ text: data.text });
   } catch (error) {
-    console.error("Error in /extract:", error);
-    res.status(500).json({ error: "Failed to process the file", details: error });
+    console.error("Error extracting text from file:", error.message);
+    res.status(500).json({ error: "Failed to extract text from file." });
   }
 });
 
