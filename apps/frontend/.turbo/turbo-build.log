@@ -1,0 +1,35 @@
+$ next build
+   Linting and checking validity of types ...
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Collecting page data ...
+   Generating static pages (0/6) ...
+   Generating static pages (1/6) 
+   Generating static pages (2/6) 
+   Generating static pages (4/6) 
+ ✓ Generating static pages (6/6) 
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (pages)                              Size     First Load JS
+┌ ○ /                                      979 B          85.1 kB
+├   /_app                                  0 B            84.1 kB
+├ λ /_documents                            15.1 kB        99.2 kB
+├ ○ /404                                   178 B          84.3 kB
+├ λ /api                                   0 B            84.1 kB
+├ λ /api/explain                           0 B            84.1 kB
+├ λ /api/extract                           0 B            84.1 kB
+├ λ /api/generateImage                     0 B            84.1 kB
+├ ○ /create-images                         953 B          85.1 kB
+├ ○ /extract-text                          923 B            85 kB
+└ ○ /generate-explanation                  988 B          85.1 kB
++ First Load JS shared by all              86.7 kB
+  ├ chunks/framework-091e8b0142f66bc2.js   45.4 kB
+  ├ chunks/main-0bfc3bcc9a49dec0.js        37.7 kB
+  ├ chunks/pages/_app-420fc8798469897d.js  294 B
+  ├ chunks/webpack-fd8027ecb5121007.js     770 B
+  └ css/2ba4215510497610.css               2.54 kB
+
+λ  (Server)  server-side renders at runtime (uses getInitialProps or getServerSideProps)
+○  (Static)  automatically rendered as static HTML (uses no initial props)
+

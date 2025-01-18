@@ -3,7 +3,7 @@ import fs from "fs";
 
 export const config = {
   api: {
-    bodyParser: false, // Disables Next.js body parsing to handle file uploads
+    bodyParser: false, // Disable Next.js body parsing to handle file uploads
   },
 };
 
@@ -18,12 +18,16 @@ export default async function handler(req, res) {
           return res.status(500).json({ error: "Failed to process file upload." });
         }
 
+        if (!files.file) {
+          return res.status(400).json({ error: "No file uploaded." });
+        }
+
         const backendUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/extract`;
 
-        const formData = new FormData();
-        formData.append("file", fs.createReadStream(files.file.filepath));
-
         try {
+          const formData = new FormData();
+          formData.append("file", fs.createReadStream(files.file.filepath));
+
           const response = await fetch(backendUrl, {
             method: "POST",
             body: formData,
@@ -37,12 +41,12 @@ export default async function handler(req, res) {
           const data = await response.json();
           res.status(200).json(data);
         } catch (error) {
-          console.error("Error forwarding file to backend:", error);
+          console.error("Error forwarding file to backend:", error.message);
           res.status(500).json({ error: "Failed to communicate with the backend." });
         }
       });
     } catch (error) {
-      console.error("Error processing extract API request:", error);
+      console.error("Error processing extract API request:", error.message);
       res.status(500).json({ error: "Failed to process the request." });
     }
   } else {

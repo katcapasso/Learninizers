@@ -1,7 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/generate-explanation": "pages/generate-explanation.js",
-  "/": "pages/index.js"
-}
+{"/_app":"pages/_app.js","/_documents":"pages/_documents.js","/api/explain":"pages/api/explain.js","/api/generateImage":"pages/api/generateImage.js","/create-images":"pages/create-images.html","/api":"pages/api.js","/extract-text":"pages/extract-text.html","/generate-explanation":"pages/generate-explanation.html","/":"pages/index.html","/_error":"pages/_error.js","/api/extract":"pages/api/extract.js","/_document":"pages/_document.js","/404":"pages/404.html"}

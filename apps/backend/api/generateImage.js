@@ -2,15 +2,15 @@ const express = require("express");
 const OpenAI = require("openai");
 const router = express.Router();
 
-// Ensure API key is loaded correctly
+// Ensure API key is loaded
 if (!process.env.OPENAI_API_KEY) {
   console.error("Error: Missing OPENAI_API_KEY in the environment variables.");
-  process.exit(1); // Stop the server if the API key is missing
+  process.exit(1);
 }
 
-// Initialize OpenAI
+// Configure OpenAI
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // This is the default, can be omitted
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 router.post("/", async (req, res) => {
@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
       size: "512x512",
     });
 
-    res.json({ url: response.data[0].url });
+    res.status(200).json({ url: response.data[0].url });
   } catch (error) {
     console.error("Error generating image:", error.message);
     res.status(500).json({

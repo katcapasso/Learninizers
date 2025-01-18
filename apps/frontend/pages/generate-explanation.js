@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatText } from "@learninizer/shared";
 
 export default function GenerateExplanation() {
   const [prompt, setPrompt] = useState("");
@@ -11,12 +12,13 @@ export default function GenerateExplanation() {
     setResult("");
 
     try {
+      const formattedPrompt = formatText(prompt);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/explain`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({ prompt: formattedPrompt }),
         }
       );
 
@@ -41,7 +43,6 @@ export default function GenerateExplanation() {
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Enter your prompt here"
           className="mb-4 p-2 w-80 h-32 border border-gray-300 rounded"
-          required
         />
         <button
           type="submit"

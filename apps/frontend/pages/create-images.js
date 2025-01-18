@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatText } from "@learninizer/shared";
 
 export default function CreateImages() {
   const [prompt, setPrompt] = useState("");
@@ -11,19 +12,20 @@ export default function CreateImages() {
     setImage("");
 
     try {
+      const formattedPrompt = formatText(prompt);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/generateImage`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({ prompt: formattedPrompt }),
         }
       );
 
       if (!response.ok) throw new Error("Failed to generate image");
 
       const data = await response.json();
-      setImage(data.url || "No image generated.");
+      setImage(data.url || "Failed to generate image.");
     } catch (error) {
       console.error("Error generating image:", error);
       setError("An error occurred while generating the image.");
@@ -39,7 +41,6 @@ export default function CreateImages() {
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Enter a description for the image"
           className="mb-4 p-2 w-80 h-32 border border-gray-300 rounded"
-          required
         />
         <button
           type="submit"

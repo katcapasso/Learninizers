@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatText } from "@learninizer/shared";
 
 export default function ExtractText() {
   const [file, setFile] = useState(null);
@@ -30,7 +31,7 @@ export default function ExtractText() {
       if (!response.ok) throw new Error("Failed to extract text");
 
       const data = await response.json();
-      setResult(data.text || "No text extracted.");
+      setResult(formatText(data.text) || "No text extracted.");
     } catch (error) {
       console.error("Error extracting text:", error);
       setError("An error occurred while extracting text.");
@@ -46,7 +47,6 @@ export default function ExtractText() {
           accept="application/pdf,image/*"
           onChange={(e) => setFile(e.target.files[0])}
           className="mb-4"
-          required
         />
         <button
           type="submit"
