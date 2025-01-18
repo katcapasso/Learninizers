@@ -2,26 +2,27 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
+// Import route handlers
 const explain = require("./api/explain");
-const extractText = require("./api/extractText"); // Ensure this file exists and is properly implemented
-const generateImage = require("./api/generateImage"); // Ensure this file exists and is properly implemented
+const extractText = require("./api/extractText");
+const generateImage = require("./api/generateImage");
 
 const app = express();
 
-// Enable CORS
-app.use(cors());
+// Enable CORS for the frontend domain
+app.use(cors({ origin: "https://learninizers.vercel.app" }));
 
 // Parse incoming requests with JSON payloads
 app.use(express.json());
 
-// Routes
-app.post("/api/explain", explain); // Route for explanation
-app.post("/api/extract", extractText); // Route for text extraction
-app.post("/api/generateImage", generateImage); // Route for image generation
+// Define API routes
+app.use("/api/explain", explain); // Route for generating explanations
+app.use("/api/extract", extractText); // Route for extracting text from files
+app.use("/api/generateImage", generateImage); // Route for generating images
 
-// Default route to verify the backend is running
+// Default route for verifying the backend is running
 app.get("/", (req, res) => {
-  res.send("Backend server is running!");
+  res.status(200).send("Backend server is running!");
 });
 
 // Start the server

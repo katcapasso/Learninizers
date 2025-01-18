@@ -1,4 +1,5 @@
 import formidable from "formidable";
+import fs from "fs";
 
 export const config = {
   api: {
@@ -22,18 +23,23 @@ export default async function handler(req, res) {
         const formData = new FormData();
         formData.append("file", fs.createReadStream(files.file.filepath));
 
-        const response = await fetch(backendUrl, {
-          method: "POST",
-          body: formData,
-        });
+        try {
+          const response = await fetch(backendUrl, {
+            method: "POST",
+            body: formData,
+          });
 
-        if (!response.ok) {
-          const error = await response.json();
-          return res.status(response.status).json(error);
+          if (!response.ok) {
+            const error = await response.json();
+            return res.status(response.status).json(error);
+          }
+
+          const data = await response.json();
+          res.status(200).json(data);
+        } catch (error) {
+          console.error("Error forwarding file to backend:", error);
+          res.status(500).json({ error: "Failed to communicate with the backend." });
         }
-
-        const data = await response.json();
-        res.status(200).json(data);
       });
     } catch (error) {
       console.error("Error processing extract API request:", error);
